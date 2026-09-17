@@ -195,7 +195,9 @@ namespace LinqEtSeedEF.Controllers
             // TODO: Même chose, mais avec Linq
             // Utilisez Where, All et Any
             bool? optionVegeLinq = null;
+            optionVegeLinq = _context.Restaurant.Where(r => r.Nom == nomDuResto).Any(r => r.Plats.Any(p => p.Vegetarien));
             bool? toutVegeLinq = null;
+            toutVegeLinq = _context.Restaurant.Where(r => r.Nom == nomDuResto).Any(r => r.Plats.All(p => p.Vegetarien));
 
             return new VegetarienViewModel("Status végétarien du restaurant : " + nomDuResto, toutVege, toutVegeLinq, optionVege, optionVegeLinq);
         }
@@ -217,9 +219,19 @@ namespace LinqEtSeedEF.Controllers
             // Note: Il y a une méthode ComparerPrix qui est déjà fournie au dessus
             // Remplir la liste avec une boucle
             List<Plat> plats = new List<Plat>();
+            foreach(var plat in _context.Plat)
+            {
+                if (plat.Vegetarien)
+                {
+                    plats.Add(plat);
+                }
+                
+            }
+            plats.Sort(ComparerPrix);
             // Obtenir la liste avec Linq
             // Utilisez Where, OrderBy et ToList
             List<Plat> platsLinq = new List<Plat>();
+            platsLinq = _context.Plat.Where(p => p.Vegetarien).OrderBy(p => p.Prix).ToList();
 
             return new PlatsViewModel("Quels sont les plats végétariens?", plats, platsLinq);
         }
@@ -230,7 +242,20 @@ namespace LinqEtSeedEF.Controllers
             // La liste doit avoir uniquement [nbPlats] entrées
             // Utilisez OrderByDescending, Take et ToList
             List<Plat> platsLesPlusChers = new List<Plat>();
+            List<Plat> tousLesPlats = new List<Plat>();
+            foreach(var plat in _context.Plat)
+            {
+                tousLesPlats.Add(plat);
+            }
+            tousLesPlats.Sort(ComparerPrix);
+            tousLesPlats.Reverse();
+            for (int i = 0; i < nbPlats && i < tousLesPlats.Count; i++)
+            {
+                platsLesPlusChers.Add(tousLesPlats[i]);
+            }
+            
             List<Plat> platsLinq = new List<Plat>();
+            platsLinq = _context.Plat.OrderByDescending(p => p.Prix).Take(nbPlats).ToList();
             
             return new PlatsViewModel("Quels sont les plats les plus chers?", platsLesPlusChers, platsLinq);
         }
