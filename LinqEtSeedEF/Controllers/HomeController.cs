@@ -158,8 +158,39 @@ namespace LinqEtSeedEF.Controllers
         {
             // TODO: Est-ce que le restaurant avec le nom [nomDuRest] a au moins un plat végé?
             bool? optionVege = null;
+            foreach(var resto in _context.Restaurant)
+            {
+                if (resto.Nom == nomDuResto)
+                {
+                    foreach(var plat in _context.Plat)
+                    {
+                        if (plat.RestaurantId == resto.Id && plat.Vegetarien == true)
+                        {
+                            optionVege = true;
+                        }
+                    }
+                }
+            }
             // TODO: Est-ce que le restaurant a UNIQUEMENT des plats végés?
             bool? toutVege = null;
+            foreach (var resto in _context.Restaurant)
+            {
+                if (resto.Nom == nomDuResto)
+                {
+                    toutVege = true;
+                    foreach (var plat in _context.Plat)
+                    {
+                        if (plat.RestaurantId == resto.Id)
+                        {
+                            if (plat.Vegetarien == false)
+                            {
+                                toutVege = false;
+                            }
+                        }
+                        
+                    }
+                }
+            }
 
             // TODO: Même chose, mais avec Linq
             // Utilisez Where, All et Any
